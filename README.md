@@ -1,0 +1,10 @@
+- [x] conectar na twitch por websocket
+- [x] criar um parser para ler o IRC da twitch
+- [x] conectar ao banco mongodb
+- [x] crud de questões para o mongodb
+- [x] criar server ws para comunicação com o front
+- [x] criar eventos para comunicação com o front
+- [x] criar fluxo do game no frontend
+- [ ] criar frontend
+- [ ] criar frontend admin para cadastro de perguntas
+- [ ] criar fluxo do game no backend

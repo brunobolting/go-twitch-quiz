@@ -88,7 +88,12 @@ func parse(message string) Message {
 		endIndex++
 		rawParameters = message[endIndex:]
 	}
-	parsed.Message = message[endIndex:]
+
+	rawMessage := strings.TrimSpace(message[endIndex:])
+	rawMessage = strings.ReplaceAll(rawMessage, "\r\n", "")
+	rawMessage = strings.ReplaceAll(rawMessage, "\n", "")
+
+	parsed.Message = rawMessage
 
 	command := parseCommand(rawCommand)
 

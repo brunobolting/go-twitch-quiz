@@ -17,6 +17,11 @@ type Message struct {
 	Command string `json:"command"`
 }
 
+type Receive struct {
+	Client *Client
+	Message Message
+}
+
 const (
 	// Time allowed to write a message to the peer.
 	writeWait = 10 * time.Second
@@ -68,7 +73,7 @@ func (c *Client) readPump() {
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, msg, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
@@ -76,7 +81,10 @@ func (c *Client) readPump() {
 			break
 		}
 		// message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.message <- message
+		// c.message <- message
+		message := Message{}
+		json.Unmarshal(msg, &message)
+		c.hub.Receive <- Receive{Client: c, Message: message}
 	}
 }
 
@@ -126,19 +134,19 @@ func (c *Client) writePump() {
 	}
 }
 
-func (c *Client) handleMessage() {
-	for {
-		select {
-		case msg := <-c.message:
-			message := Message{}
-			json.Unmarshal(msg, &message)
-			log.Println(message)
-			if message.Command == "getQuestion" {
-				c.send <- []byte("{\"q\": \"o que é o que é?\"}")
-			}
-		}
-	}
-}
+// func (c *Client) handleMessage() {
+// 	for {
+// 		select {
+// 		case msg := <-c.message:
+// 			message := Message{}
+// 			json.Unmarshal(msg, &message)
+// 			log.Println(message)
+// 			if message.Command == "getQuestion" {
+// 				c.send <- []byte("{\"q\": \"o que é o que é?\"}")
+// 			}
+// 		}
+// 	}
+// }
 
 // serveWs handles websocket requests from the peer.
 func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
@@ -154,5 +162,5 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	// new goroutines.
 	go client.writePump()
 	go client.readPump()
-	go client.handleMessage()
+	// go client.handleMessage()
 }

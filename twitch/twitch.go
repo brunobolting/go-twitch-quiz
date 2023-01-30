@@ -1,7 +1,6 @@
 package twitch
 
 import (
-	"encoding/json"
 	"log"
 	"math/rand"
 	"os"
@@ -14,9 +13,10 @@ import (
 type Twitch struct {
 	conn      *websocket.Conn
 	send      chan []byte
-	message   chan Message
+	Message   chan Message
 	close     chan interface{}
 	interrupt chan os.Signal
+	Answer chan Message
 }
 
 func dial() *websocket.Conn {
@@ -34,9 +34,10 @@ func NewTwitch() *Twitch {
 	tw := &Twitch{
 		conn:      dial(),
 		send:      make(chan []byte),
-		message:   make(chan Message),
+		Message:   make(chan Message),
 		close:     make(chan interface{}),
 		interrupt: make(chan os.Signal),
+		Answer:    make(chan Message),
 	}
 
 	// signal.Notify(tw.interrupt, os.Interrupt)
@@ -55,13 +56,6 @@ func (tw *Twitch) Run(channel string, hub *ws.Hub) {
 
 	<-make(chan struct{})
 	return
-
-	// for {
-	// 	select {
-	// 	case <-tw.close:
-	// 		return
-	// 	}
-	// }
 }
 
 func (tw *Twitch) handleshake(channel string) {
@@ -107,7 +101,7 @@ func (tw *Twitch) readPump() {
 			}
 			break
 		}
-		tw.message <- parse(string(msg))
+		tw.Message <- parse(string(msg))
 	}
 }
 
@@ -146,16 +140,17 @@ func (tw *Twitch) handleMessage(hub *ws.Hub) {
 
 	for {
 		select {
-		case message := <-tw.message:
+		case message := <-tw.Message:
 			if message.Command.Command == "PING" {
 				tw.send <- []byte("PONG")
 			}
 
 			if message.Command.Command == "PRIVMSG" {
+				tw.Answer <- message
 				// log.Printf("%s | %s: %s\n", message.Command.Command, message.Author, message.Message)
-				json, _ := json.Marshal(message)
-				log.Printf(string(json))
-				hub.Broadcast <- json
+				// json, _ := json.Marshal(message)
+				// log.Printf(string(json))
+				// hub.Broadcast <- json
 			}
 		}
 	}
