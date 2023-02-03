@@ -60,12 +60,12 @@ func (h *Hub) Run() {
 				}
 			}
 		case prvMsg := <-h.SendPrivate:
-				select {
-				case prvMsg.Client.send <- prvMsg.Message:
-				default:
-					close(prvMsg.Client.send)
-					delete(h.clients, prvMsg.Client)
-				}
+			select {
+			case prvMsg.Client.send <- prvMsg.Message:
+			default:
+				close(prvMsg.Client.send)
+				delete(h.clients, prvMsg.Client)
+			}
 		}
 	}
 }

@@ -1,107 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Chat Example</title>
-<script type="text/javascript">
-window.onload = function () {
-    var conn;
-    var msg = document.getElementById("msg");
-    var log = document.getElementById("log");
-    let question = null
-
-    function appendLog(item) {
-        var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
-        log.appendChild(item);
-        if (doScroll) {
-            log.scrollTop = log.scrollHeight - log.clientHeight;
-        }
-    }
-
-    document.getElementById("form").onsubmit = function () {
-        if (!conn) {
-            return false;
-        }
-        if (!msg.value) {
-            return false;
-        }
-        conn.send(msg.value);
-        msg.value = "";
-        return false;
-    };
-
-    if (window["WebSocket"]) {
-        conn = new WebSocket("ws://" + document.location.host + "/ws");
-        conn.onclose = function (evt) {
-            var item = document.createElement("div");
-            item.innerHTML = "<b>Connection closed.</b>";
-            appendLog(item);
-        };
-        conn.onmessage = function (evt) {
-            var messages = evt.data.split('\n');
-            for (var i = 0; i < messages.length; i++) {
-                var item = document.createElement("div");
-                let message = JSON.parse(messages[i])
-                item.innerHTML = `<spam style='color: ${message.color}'>${message.author}</spam>: ${message.message}`;
-                appendLog(item);
-            }
-        };
-        let getQuestion = document.getElementById("get-question-btn")
-        getQuestion.addEventListener("click", (ev) => {
-            ev.preventDefault()
-            command = document.getElementById("text-box").value
-            conn.send(JSON.stringify({command: command}))
-        })
-    } else {
-        var item = document.createElement("div");
-        item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
-        appendLog(item);
-    }
-};
-</script>
-<style type="text/css">
-html {
-    overflow: hidden;
-}
-
-body {
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    background: gray;
-}
-
-#log {
-    background: white;
-    margin: 0;
-    padding: 0.5em 0.5em 0.5em 0.5em;
-    position: absolute;
-    top: 0.5em;
-    left: 0.5em;
-    right: 0.5em;
-    bottom: 3em;
-    overflow: auto;
-}
-
-#form {
-    padding: 0 0.5em 0 0.5em;
-    margin: 0;
-    position: absolute;
-    bottom: 1em;
-    left: 0px;
-    width: 100%;
-    overflow: hidden;
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./assets/styles/index.css" />
+    <title>Document</title>
 </head>
 <body>
-<div id="log"></div>
-<form id="form">
-    <input type="submit" value="Send" />
-    <input id="text-box" type="text" id="msg" size="64" autofocus />
-    <button id="get-question-btn">Send Command</button>
-</form>
+    <main class="container">
+        <div class="top-page default-background">
+            <div class="top-wrap">
+                <div class="answer-wrap">
+                    <div class="answer-box hidden">
+                        <div class="user"></div>
+                        <div class="description">acertou</div>
+                        <div class="answer"></div>
+                    </div>
+                    <div class="waiting"></div>
+                </div>
+                <div class="winners-wrap">
+                    <p class="win-title">Leaderboards:</p>
+                    <ul class="winners">
+                        <!--
+                        <li><spam class="counter">1</spam> <spam class="user">brunobolting</spam></li>
+                        <li><spam class="counter">2</spam> <spam class="user">brunoboltingawdawdawd</spam></li>
+                        <li><spam class="counter">1</spam> <spam class="user">bruno</spam></li>
+                        <li><spam class="counter">1</spam> <spam class="user">brunobolting</spam></li>
+                        <li><spam class="counter">1</spam> <spam class="user">brunobolting</spam></li>
+                        <li><spam class="counter">1</spam> <spam class="user">brunobolting</spam></li>
+                        -->
+                    </ul>
+                </div>
+            </div>
+            <div class="rainbow-box"></div>
+        </div>
+        <div class="bottom-page">
+            <div class="time-box">
+                <div class="timer">00</div>
+                <div class="alert">
+                    <div class="title">Acerte a resposta!</div>
+                    <div class="message">Digite seus palpites no chat!</div>
+                </div>
+            </div>
+            <div class="question-box"></div>
+        </div>
+    </main>
+    <script type="module" src="./assets/scripts/index.js"></script>
 </body>
 </html>

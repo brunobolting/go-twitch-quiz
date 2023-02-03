@@ -27,15 +27,12 @@ func init() {
 }
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.Error(w, "Not found", http.StatusNotFound)
-		return
-	}
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	http.ServeFile(w, r, "public")
+    p := "./public" + r.URL.Path
+    if p == "./" {
+        p = "./public/index.html"
+    }
+
+	http.ServeFile(w, r, p)
 }
 
 func main() {

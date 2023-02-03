@@ -1,0 +1,289 @@
+@font-face {
+    font-family: 'Cabin';
+    src: url('../fonts/Cabin.ttf') format('truetype')
+}
+
+@font-face {
+    font-family: 'Cabin-Italic';
+    src: url('../fonts/Cabin-Italic.ttf') format('truetype')
+}
+
+@font-face {
+    font-family: 'BebasNeue';
+    src: url('../fonts/BebasNeue.ttf') format('truetype')
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #fdfdfd;
+}
+
+.container {
+    display: grid;
+    /* align-items: stretch;
+    justify-items: stretch; */
+    grid-template-rows: 60% 40%;
+    font-family: "Cabin", sans-serif;
+    height: 100vh;
+    color: #444;
+    transition: all 1s;
+}
+
+.container > .top-page {
+    /* background-color: #6440aa; */
+    /* background-color: hsl(229, 100%, 65%); */
+    /* background-color: #50C878; */
+    /* background-color: #3b9759; */
+    /* background-color: #00A36C; */
+    /* background-color: #AFE1AF; */
+    /* background-color: #4CBB17; */
+    /* background-image: linear-gradient(to right bottom, #4063fc, #575df9, #6a57f6, #7a4ff2, #8847ee); */
+    transition: all 0.5s ease-in;
+    /* background-color: #824dff; */
+}
+
+.default-background {
+    /* background-image: linear-gradient(to right bottom, #4063fc, #535ffe, #645aff, #7354ff, #824dff); */
+    background-color: #4063fc;
+}
+
+.win-background {
+    /* background-image: linear-gradient(to right bottom, #4063fc, #535ffe, #645aff, #7354ff, #824dff); */
+    background-color: #50C878;
+}
+
+.loose-background {
+    /* background-image: linear-gradient(to right bottom, #4063fc, #535ffe, #645aff, #7354ff, #824dff); */
+    /* background-color: #ff6961; */
+    background-color: #e46b71;
+}
+
+.top-page > .logo {
+    background-image: url("/assets/images/brat-logo.png");
+    height: 100%; /* You must set a specified height */
+    /* background-position: center; */
+    background-repeat: no-repeat;
+    background-size: 300px;
+    /* filter: opacity(0.1); */
+    /* filter: contrast(60%) opacity(0.1); */
+    /* background-size: contain; */
+}
+
+.container > .bottom-page {
+    display: grid;
+    grid-template-columns: 35% 65%;
+    /* gap: 5%; */
+    align-items: center;
+    /* grid-template-areas: ". timer text ."; */
+    width: 1400px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.bottom-page > .time-box {
+    padding: 3%;
+    /* width: 85%; */
+    /* height: 25%; */
+    width: 450px;
+    height: 100px;
+    border-radius: 15px;
+    box-shadow: 5px 5px 10px rgb(0 0 0 / 0.2);
+    /* grid-area: timer; */
+    display: flex;
+    /* align-items: center; */
+    gap: 30px;
+    background-color: #fff;
+}
+
+.bottom-page > .question-box {
+    padding: 3%;
+    /* grid-area: text; */
+    font-family: "Cabin-Italic", sans-serif;
+    /* font-style: italic; */
+    font-size: 1.6rem;
+    line-height: 1.8rem;
+}
+
+.time-box > .timer {
+    margin-left: 20px;
+    font-size: 4rem;
+    font-family: 'BebasNeue', cursive;
+    color: #333;
+}
+
+.time-box > .alert {
+    font-size: 1.2rem;
+    align-self: center;
+}
+
+.time-box > .alert > .title {
+    font-weight: bold;
+}
+
+.top-page {
+    color: #fefefe;
+}
+
+.top-page > .top-wrap {
+    max-width: 1400px;
+    height: 100%;
+    margin: 0 auto;
+    font-size: 1.2rem;
+    letter-spacing: 0.7px;
+    display: grid;
+    padding-left: 20px;
+    padding-right: 20px;
+    grid-template-rows: 60% 40%;
+}
+
+.winners-wrap > .win-title {
+    font-weight: bold;
+    font-style: italic;
+}
+
+.winners {
+    list-style-type: none;
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    max-height: 140px;
+    align-content: flex-start;
+    column-gap: 20px;
+    font-size: 1.2rem;
+}
+
+.winners > li {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.winners > li > .counter {
+    background-color: #222;
+    border-radius: 5px;
+    width: 40px;
+    text-align: center;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.answer-wrap > .waiting {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.answer-box {
+    justify-self: center;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.answer-box > .user {
+    font-size: 2.5rem;
+}
+
+.answer-box > .description {
+    font-size: 1.2rem;
+    rotate: -10deg;
+
+    /* -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(
+        35deg,
+        hsl(310, 100%, 65%),
+        hsl(160, 100%, 65%)
+    );
+    background-size: 200% 200%; */
+    /* animation: gradient 5s ease-in infinite; */
+    animation: rotate 4s ease infinite;
+}
+
+.answer-box > .answer {
+    font-size: 5rem;
+    text-transform: uppercase;
+    font-family: 'BebasNeue', cursive;
+}
+
+@keyframes rotate {
+    0% {
+        rotate: -10deg;
+    }
+    50% {
+        rotate: 10deg
+    }
+    100% {
+        rotate: -10deg
+    }
+}
+
+@keyframes gradient {
+    0% {
+        rotate: 180deg
+    }
+    50% {
+        rotate: 360deg;
+    }
+    100% {
+        rotate: 180deg;
+    }
+}
+
+.rainbow-box {
+    border-bottom: 5px solid transparent;
+    border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
+    border-image-slice: 1;
+    width: 100%;
+}
+
+.word {
+    animation: append-animate 1s ease-in-out;
+}
+
+@keyframes append-animate {
+	from {
+		opacity: 0;
+        font-size: 1.2rem;
+	}
+    to {
+		opacity: 1;
+        font-size: 1.6rem;
+    }
+}
+
+.color-red {
+    /* color: #ff0038; */
+    color: #EB455F;
+}
+
+.hidden {
+    opacity: 0;
+}
+
+.waiting {
+    position: absolute;
+    width: 100px;
+    height: 20px;
+    background-color: #fefefe;
+    border-radius: 20px;
+    top: 20%;
+
+    /* -webkit-background-clip: border-box;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(
+        35deg,
+        hsl(310, 100%, 65%),
+        hsl(160, 100%, 65%)
+    );
+    background-size: 200% 200%; */
+    /* animation: gradient 5s ease-in infinite; */
+}
