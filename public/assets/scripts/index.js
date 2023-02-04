@@ -4,8 +4,10 @@ import Game from "./game.js"
 const WS_URL = "ws://localhost:8080/ws"
 
 const run = () => {
-    // const conn = new Ws()
-    const conn = new WebSocket(WS_URL)
+    const searchParams = new URLSearchParams(window.location.search);
+    const channel = searchParams.get("chat-from");
+
+    const conn = new WebSocket(`${WS_URL}?channel=${channel}`)
     const game = new Game(conn)
 
     conn.onmessage = (event) => {

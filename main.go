@@ -6,9 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/brunobolting/go-twitch-chat/game"
 	"github.com/brunobolting/go-twitch-chat/infra/repo"
-	"github.com/brunobolting/go-twitch-chat/twitch"
 	"github.com/brunobolting/go-twitch-chat/usecase/question"
 	"github.com/brunobolting/go-twitch-chat/ws"
 	"github.com/joho/godotenv"
@@ -50,18 +48,15 @@ func main() {
 	// log.Println(questionService.GetQuestion("3a976cf7-e872-41ed-83fa-9806df677605"))
 	// log.Println(questionService.GetRandomQuestion())
 
-	hub := ws.NewHub()
-	go hub.Run()
+	// tw := twitch.NewTwitch()
+	// go tw.Run(os.Getenv("TWITCH_CHANNEL"), hub)
 
-	tw := twitch.NewTwitch()
-	go tw.Run(os.Getenv("TWITCH_CHANNEL"), hub)
-
-	game := game.NewGame(tw, hub, questionService)
-	go game.Run()
+	// game := game.NewGame(tw, hub, questionService)
+	// go game.Run()
 
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		ws.ServeWs(hub, w, r)
+		ws.ServeWs(w, r, questionService)
 	})
 
 	addr := os.Getenv("API_HOST")+":"+os.Getenv("API_PORT")

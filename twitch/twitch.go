@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/brunobolting/go-twitch-chat/ws"
 	"github.com/gorilla/websocket"
 )
 
@@ -45,14 +44,14 @@ func NewTwitch() *Twitch {
 	return tw
 }
 
-func (tw *Twitch) Run(channel string, hub *ws.Hub) {
+func (tw *Twitch) Run(channel string) {
 	defer tw.conn.Close()
 
 	tw.handleshake(channel)
 
 	go tw.readPump()
 	go tw.writePump()
-	go tw.handleMessage(hub)
+	go tw.handleMessage()
 
 	<-make(chan struct{})
 	return
@@ -135,7 +134,7 @@ func (tw *Twitch) writePump() {
 	}
 }
 
-func (tw *Twitch) handleMessage(hub *ws.Hub) {
+func (tw *Twitch) handleMessage() {
 	defer close(tw.close)
 
 	for {

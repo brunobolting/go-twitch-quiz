@@ -7,25 +7,29 @@ import (
 	"github.com/brunobolting/go-twitch-chat/entity"
 	"github.com/brunobolting/go-twitch-chat/twitch"
 	"github.com/brunobolting/go-twitch-chat/usecase/question"
-	"github.com/brunobolting/go-twitch-chat/ws"
 )
+
+type Command struct {
+	Command string `json:"command"`
+}
 
 type Game struct {
 	Twitch *twitch.Twitch
-	Hub *ws.Hub
 	QuestionService *question.Service
 	Question entity.Question
 	PreviusQuestions []string
-	Client *ws.Client
 	RoundEnded bool
+	Command chan *Command
+	SendToClient chan []byte
 }
 
-func NewGame(tw *twitch.Twitch, hub *ws.Hub, qs *question.Service) *Game {
+func NewGame(tw *twitch.Twitch, qs *question.Service) *Game {
 	return &Game{
 		Twitch: tw,
-		Hub: hub,
 		QuestionService: qs,
 		RoundEnded: false,
+		Command: make(chan *Command),
+		SendToClient: make(chan []byte),
 	}
 }
 
@@ -49,8 +53,8 @@ func (g *Game) Start() error {
 func (g *Game) Run() {
 	for {
 		select {
-		case received := <-g.Hub.Receive:
-			if received.Message.Command == "START_ROUND" {
+		case received := <-g.Command:
+			if received.Command == "START_ROUND" {
 				g.RoundEnded = false
 				err := g.Start()
 				if err != nil {
@@ -61,11 +65,10 @@ func (g *Game) Run() {
 				if err != nil {
 					log.Fatalln(err)
 				}
-				g.Client = received.Client
-				g.Hub.SendPrivate <- ws.Private{Client: received.Client, Message: json}
+				g.SendToClient <- json
 			}
 
-			if received.Message.Command == "ROUND_END" {
+			if received.Command == "ROUND_END" {
 				g.RoundEnded = true
 			}
 		case message := <-g.Twitch.Answer:
@@ -76,7 +79,7 @@ func (g *Game) Run() {
 					log.Fatalln(err)
 				}
 				g.RoundEnded = true
-				g.Hub.SendPrivate <- ws.Private{Client: g.Client, Message: json}
+				g.SendToClient <- json
 			}
 		}
 	}
