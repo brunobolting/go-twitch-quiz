@@ -4,7 +4,7 @@
 - [x] crud de questões para o mongodb
 - [x] criar server ws para comunicação com o front
 - [x] criar eventos para comunicação com o front
+- [x] criar fluxo do game no backend
 - [x] criar fluxo do game no frontend
-- [ ] criar frontend
+- [x] criar frontend
 - [ ] criar frontend admin para cadastro de perguntas
-- [ ] criar fluxo do game no backend
