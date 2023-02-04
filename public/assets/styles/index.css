@@ -48,13 +48,6 @@ body {
     background-color: #e46b71;
 }
 
-.top-page > .logo {
-    background-image: url("/assets/images/brat-logo.png");
-    height: 100%;
-    background-repeat: no-repeat;
-    background-size: 300px;
-}
-
 .container > .bottom-page {
     display: grid;
     grid-template-columns: 35% 65%;
