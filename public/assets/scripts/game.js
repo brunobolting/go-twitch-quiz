@@ -13,8 +13,8 @@ class Game {
         this.answer = document.querySelector(".answer-box > .answer")
         this.waitBar = document.querySelector(".answer-wrap > .waiting")
         this.leaderboard = document.querySelector(".winners")
-        this.roundTime = 11
-        this.breaktimeTime = 11
+        this.roundTime = 81
+        this.breaktimeTime = 16
         this.winnersList = []
     }
 
@@ -56,7 +56,6 @@ class Game {
 
         if (message.event === "WINNER") {
             this.winnerScreen(message)
-            console.log("winner winner chicken dinner", message)
         }
     }
 
@@ -86,7 +85,7 @@ class Game {
             this.startRound()
         }
 
-        new CountDown(this.getRoundTimer(this.breaktimeTime), render, complete)
+        this.countdown = new CountDown(this.getRoundTimer(this.breaktimeTime), render, complete)
     }
 
     looseScreen() {
@@ -110,7 +109,7 @@ class Game {
             this.startRound()
         }
 
-        new CountDown(this.getRoundTimer(this.breaktimeTime), render, complete)
+        this.countdown = new CountDown(this.getRoundTimer(this.breaktimeTime), render, complete)
     }
 
     updateLeaderboard(winner) {
@@ -118,18 +117,10 @@ class Game {
 
         this.leaderboard.innerHTML = ""
         for (const winner in this.winnersList) {
-            // console.log(winner, this.winnersList[winner].wins)
             let node = document.createElement("li")
             node.innerHTML = `<spam class="counter">${this.winnersList[winner].wins}</spam> <spam class="user">${winner}</spam>`
             this.leaderboard.appendChild(node)
         }
-        // this.winnersList.forEach((val, index) => {
-        //     console.log(val, index)
-
-        //     let node = document.createElement("li")
-        //     node.innerHTML = `<spam class="counter">${val.wins}</spam> <spam class="user">${index}</spam>`
-        //     this.leaderboard.appendChild(node)
-        // })
     }
 
     updateWinnerList(winner) {
@@ -175,6 +166,10 @@ class Game {
             nextWord()
             interval = setInterval(nextWord, delay)
         }, delay)
+    }
+
+    stop() {
+        this.countdown.stop()
     }
 
     formatSeconds(t) {

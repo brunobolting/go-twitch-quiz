@@ -25,8 +25,6 @@ body {
 
 .container {
     display: grid;
-    /* align-items: stretch;
-    justify-items: stretch; */
     grid-template-rows: 60% 40%;
     font-family: "Cabin", sans-serif;
     height: 100vh;
@@ -35,51 +33,32 @@ body {
 }
 
 .container > .top-page {
-    /* background-color: #6440aa; */
-    /* background-color: hsl(229, 100%, 65%); */
-    /* background-color: #50C878; */
-    /* background-color: #3b9759; */
-    /* background-color: #00A36C; */
-    /* background-color: #AFE1AF; */
-    /* background-color: #4CBB17; */
-    /* background-image: linear-gradient(to right bottom, #4063fc, #575df9, #6a57f6, #7a4ff2, #8847ee); */
     transition: all 0.5s ease-in;
-    /* background-color: #824dff; */
 }
 
 .default-background {
-    /* background-image: linear-gradient(to right bottom, #4063fc, #535ffe, #645aff, #7354ff, #824dff); */
     background-color: #4063fc;
 }
 
 .win-background {
-    /* background-image: linear-gradient(to right bottom, #4063fc, #535ffe, #645aff, #7354ff, #824dff); */
     background-color: #50C878;
 }
 
 .loose-background {
-    /* background-image: linear-gradient(to right bottom, #4063fc, #535ffe, #645aff, #7354ff, #824dff); */
-    /* background-color: #ff6961; */
     background-color: #e46b71;
 }
 
 .top-page > .logo {
     background-image: url("/assets/images/brat-logo.png");
-    height: 100%; /* You must set a specified height */
-    /* background-position: center; */
+    height: 100%;
     background-repeat: no-repeat;
     background-size: 300px;
-    /* filter: opacity(0.1); */
-    /* filter: contrast(60%) opacity(0.1); */
-    /* background-size: contain; */
 }
 
 .container > .bottom-page {
     display: grid;
     grid-template-columns: 35% 65%;
-    /* gap: 5%; */
     align-items: center;
-    /* grid-template-areas: ". timer text ."; */
     width: 1400px;
     margin: 0 auto;
     padding-left: 20px;
@@ -196,15 +175,6 @@ body {
     font-size: 1.2rem;
     rotate: -10deg;
 
-    /* -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(
-        35deg,
-        hsl(310, 100%, 65%),
-        hsl(160, 100%, 65%)
-    );
-    background-size: 200% 200%; */
-    /* animation: gradient 5s ease-in infinite; */
     animation: rotate 4s ease infinite;
 }
 
@@ -276,14 +246,38 @@ body {
     background-color: #fefefe;
     border-radius: 20px;
     top: 20%;
+}
 
-    /* -webkit-background-clip: border-box;
-    -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(
-        35deg,
-        hsl(310, 100%, 65%),
-        hsl(160, 100%, 65%)
-    );
-    background-size: 200% 200%; */
-    /* animation: gradient 5s ease-in infinite; */
+.modal-error {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-error > .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding-left: 25px;
+    padding-right: 25px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border: 1px solid #888;
+    max-width: 600px;
+    height: 15%;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    border-radius: 20px;
+    gap: 15px;
+}
+
+.boshy {
+    width: 50px;
 }

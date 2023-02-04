@@ -1,7 +1,3 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package ws
 
 import (
@@ -39,27 +35,22 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// Client is a middleman between the websocket connection and the hub.
 type Client struct {
-	hub *Hub
-
-	// The websocket connection.
 	conn *websocket.Conn
 
-	// Buffered channel of outbound messages.
-	// send chan []byte
-
 	game *game.Game
+
+	tw *twitch.Twitch
+
+	interrupt chan struct{}
 }
 
-// readPump pumps messages from the websocket connection to the hub.
-//
-// The application runs readPump in a per-connection goroutine. The application
-// ensures that there is at most one reader on a connection by executing all
-// reads from this goroutine.
 func (c *Client) readPump() {
 	defer func() {
 		c.conn.Close()
+		close(c.interrupt)
+		close(c.tw.Close)
+		close(c.game.Close)
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -72,20 +63,13 @@ func (c *Client) readPump() {
 			}
 			break
 		}
-		// message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		// c.message <- message
+
 		command := &game.Command{}
 		json.Unmarshal(msg, &command)
-		// c.hub.Receive <- Receive{Client: c, Message: message}
 		c.game.Command <- command
 	}
 }
 
-// writePump pumps messages from the hub to the websocket connection.
-//
-// A goroutine running writePump is started for each connection. The
-// application ensures that there is at most one writer to a connection by
-// executing all writes from this goroutine.
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -97,7 +81,6 @@ func (c *Client) writePump() {
 		case message, ok := <-c.game.SendToClient:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
@@ -122,35 +105,22 @@ func (c *Client) writePump() {
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
+		case <-c.interrupt:
+			return
 		}
 	}
 }
 
-// func (c *Client) handleMessage() {
-// 	for {
-// 		select {
-// 		case msg := <-c.message:
-// 			message := Message{}
-// 			json.Unmarshal(msg, &message)
-// 			log.Println(message)
-// 			if message.Command == "getQuestion" {
-// 				c.send <- []byte("{\"q\": \"o que é o que é?\"}")
-// 			}
-// 		}
-// 	}
-// }
-
-// serveWs handles websocket requests from the peer.
 func ServeWs(w http.ResponseWriter, r *http.Request, service *question.Service) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Fatalln(err)
+	queryParams := r.URL.Query()
+	chat := queryParams.Get("channel")
+	if chat == "" {
 		return
 	}
 
-	queryParams := r.URL.Query()
-	channel := queryParams.Get("channel")
-	if channel == "" {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Fatalln(err)
 		return
 	}
 
@@ -158,14 +128,10 @@ func ServeWs(w http.ResponseWriter, r *http.Request, service *question.Service) 
 
 	game := game.NewGame(tw, service)
 
-	client := &Client{conn: conn, game: game}
-	// client.hub.register <- client
+	client := &Client{conn: conn, game: game, tw: tw, interrupt: make(chan struct{})}
 
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
-	go tw.Run(channel)
+	go tw.Run(chat)
 	go game.Run()
 	go client.writePump()
 	go client.readPump()
-	// go client.handleMessage()
 }

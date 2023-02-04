@@ -21,6 +21,7 @@ type Game struct {
 	RoundEnded bool
 	Command chan *Command
 	SendToClient chan []byte
+	Close chan struct{}
 }
 
 func NewGame(tw *twitch.Twitch, qs *question.Service) *Game {
@@ -30,6 +31,7 @@ func NewGame(tw *twitch.Twitch, qs *question.Service) *Game {
 		RoundEnded: false,
 		Command: make(chan *Command),
 		SendToClient: make(chan []byte),
+		Close: make(chan struct{}),
 	}
 }
 
@@ -81,6 +83,8 @@ func (g *Game) Run() {
 				g.RoundEnded = true
 				g.SendToClient <- json
 			}
+		case <-g.Close:
+			return
 		}
 	}
 }

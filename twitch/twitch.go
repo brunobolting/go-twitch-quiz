@@ -3,7 +3,7 @@ package twitch
 import (
 	"log"
 	"math/rand"
-	"os"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -13,9 +13,10 @@ type Twitch struct {
 	conn      *websocket.Conn
 	send      chan []byte
 	Message   chan Message
-	close     chan interface{}
-	interrupt chan os.Signal
 	Answer chan Message
+	Close chan struct{}
+	closeHandler chan struct{}
+	wg sync.WaitGroup
 }
 
 func dial() *websocket.Conn {
@@ -24,7 +25,6 @@ func dial() *websocket.Conn {
 	if err != nil {
 		log.Fatal("Error connecting to Websocket Server:", err)
 	}
-	log.Println("connected to IRC server...")
 
 	return conn
 }
@@ -34,49 +34,52 @@ func NewTwitch() *Twitch {
 		conn:      dial(),
 		send:      make(chan []byte),
 		Message:   make(chan Message),
-		close:     make(chan interface{}),
-		interrupt: make(chan os.Signal),
 		Answer:    make(chan Message),
+		Close: make(chan struct{}),
+		closeHandler: make(chan struct{}),
 	}
-
-	// signal.Notify(tw.interrupt, os.Interrupt)
 
 	return tw
 }
 
 func (tw *Twitch) Run(channel string) {
-	defer tw.conn.Close()
+	defer func() {
+		tw.conn.Close()
+	}()
 
-	tw.handleshake(channel)
+	tw.wg.Add(3)
+
+	err := tw.handleshake(channel)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	go tw.readPump()
 	go tw.writePump()
 	go tw.handleMessage()
 
-	<-make(chan struct{})
-	return
+	tw.wg.Wait()
 }
 
-func (tw *Twitch) handleshake(channel string) {
-	// tw.send <- []byte("CAP REQ twitch.tv/tags")
+func (tw *Twitch) handleshake(channel string) error {
 	err := tw.conn.WriteMessage(websocket.TextMessage, []byte("CAP REQ twitch.tv/tags"))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	nickname := generateAnonymousNickname()
 
-	// tw.send <- []byte("NICK " + nickname)
 	err = tw.conn.WriteMessage(websocket.TextMessage, []byte("NICK "+nickname))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	// tw.send <- []byte("JOIN #" + channel)
 	err = tw.conn.WriteMessage(websocket.TextMessage, []byte("JOIN #"+channel))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 func generateAnonymousNickname() string {
@@ -90,7 +93,10 @@ func generateAnonymousNickname() string {
 }
 
 func (tw *Twitch) readPump() {
-	defer close(tw.close)
+	defer func()  {
+		tw.wg.Done()
+		tw.conn.Close()
+	}()
 
 	for {
 		_, msg, err := tw.conn.ReadMessage()
@@ -105,37 +111,37 @@ func (tw *Twitch) readPump() {
 }
 
 func (tw *Twitch) writePump() {
+	defer func()  {
+		tw.wg.Done()
+		tw.conn.Close()
+		close(tw.closeHandler)
+	}()
+
 	for {
 		select {
 		case message := <-tw.send:
 			err := tw.conn.WriteMessage(websocket.TextMessage, message)
-			if err == nil {
-				log.Printf("send: %s", message)
+			if err != nil {
+				log.Printf("error: %s | send: %s", err, message)
+				return
 			}
-		case <-tw.interrupt:
-			// We received a SIGINT (Ctrl + C). Terminate gracefully...
-			log.Println("Received SIGINT interrupt signal. Closing all pending connections")
-
-			// Close our websocket connection
+		case <-tw.Close:
 			err := tw.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
 				log.Println("Error during closing websocket:", err)
 				return
 			}
 
-			select {
-			case <-tw.close:
-				log.Println("Channels Closed! Exiting....")
-			case <-time.After(time.Duration(1) * time.Second):
-				log.Println("Timeout in closing receiving channel. Exiting....")
-			}
 			return
 		}
 	}
 }
 
 func (tw *Twitch) handleMessage() {
-	defer close(tw.close)
+	defer func()  {
+		tw.wg.Done()
+		close(tw.Message)
+	}()
 
 	for {
 		select {
@@ -146,11 +152,9 @@ func (tw *Twitch) handleMessage() {
 
 			if message.Command.Command == "PRIVMSG" {
 				tw.Answer <- message
-				// log.Printf("%s | %s: %s\n", message.Command.Command, message.Author, message.Message)
-				// json, _ := json.Marshal(message)
-				// log.Printf(string(json))
-				// hub.Broadcast <- json
 			}
+		case <-tw.closeHandler:
+			return
 		}
 	}
 }

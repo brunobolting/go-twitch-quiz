@@ -48,12 +48,6 @@ func main() {
 	// log.Println(questionService.GetQuestion("3a976cf7-e872-41ed-83fa-9806df677605"))
 	// log.Println(questionService.GetRandomQuestion())
 
-	// tw := twitch.NewTwitch()
-	// go tw.Run(os.Getenv("TWITCH_CHANNEL"), hub)
-
-	// game := game.NewGame(tw, hub, questionService)
-	// go game.Run()
-
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		ws.ServeWs(w, r, questionService)
