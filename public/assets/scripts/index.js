@@ -7,7 +7,7 @@ const error = modal.querySelector(".error")
 const run = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const channel = searchParams.get("chat-from");
-    console.log(channel)
+
     if (channel === "" || channel === null) {
         modal.style.display = "block";
         error.innerHTML = "Chat não informado..."

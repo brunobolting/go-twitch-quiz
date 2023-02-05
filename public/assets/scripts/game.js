@@ -116,21 +116,26 @@ class Game {
         this.updateWinnerList(winner)
 
         this.leaderboard.innerHTML = ""
-        for (const winner in this.winnersList) {
+        this.winnersList.forEach((winner) => {
             let node = document.createElement("li")
-            node.innerHTML = `<spam class="counter">${this.winnersList[winner].wins}</spam> <spam class="user">${winner}</spam>`
+            node.innerHTML = `<spam class="counter">${winner.wins}</spam> <spam class="user">${winner.user}</spam>`
             this.leaderboard.appendChild(node)
-        }
+        })
     }
 
     updateWinnerList(winner) {
-        if (this.winnersList[winner.user] !== undefined) {
-            this.winnersList[winner.user].wins++
+        let index = this.winnersList.findIndex((obj) => obj.user === winner.user)
+
+        if (index === -1) {
+            this.winnersList.push({user: winner.user, wins: 1})
         } else {
-            this.winnersList[winner.user] = {wins: 1}
+            this.winnersList[index] = {
+                user: this.winnersList[index].user,
+                wins: this.winnersList[index].wins + 1
+            }
         }
 
-        this.winnersList.sort((a, b) => (b.wins > a.wins) ? 1 : -1)
+        this.winnersList.sort((a, b) => b.wins - a.wins)
     }
 
     getRoundTimer(seconds) {
