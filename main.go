@@ -9,20 +9,11 @@ import (
 	"github.com/brunobolting/go-twitch-chat/infra/repo"
 	"github.com/brunobolting/go-twitch-chat/usecase/question"
 	"github.com/brunobolting/go-twitch-chat/ws"
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var interrupt os.Signal
-
-func init() {
-    err := godotenv.Load(".env")
-
-    if err != nil {
-        log.Fatal("Error loading .env file")
-    }
-}
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
     p := "./public" + r.URL.Path
@@ -48,12 +39,21 @@ func main() {
 	// log.Println(questionService.GetQuestion("3a976cf7-e872-41ed-83fa-9806df677605"))
 	// log.Println(questionService.GetRandomQuestion())
 
+
+	// if os.Getenv("RUN_FIXTURE") == "true" {
+	// 	err = fixture.Run(questionService)
+	// 	if err != nil {
+	// 		log.Fatal("Error to apply fixtures: ", err)
+	// 	}
+	// }
+
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		ws.ServeWs(w, r, questionService)
 	})
 
 	addr := os.Getenv("API_HOST")+":"+os.Getenv("API_PORT")
+	log.Println("listening:", addr)
 	err = http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

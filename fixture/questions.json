@@ -1,0 +1,29 @@
+[
+    {
+        "question": "Quantas patas tem um gato?",
+        "answers": [
+            "4",
+            "quatro"
+        ]
+    },
+    {
+        "question": "Personagem italiano, narigudo e bigodudo que se veste de verde",
+        "answers": [
+            "luigi",
+            "mario verde"
+        ]
+    },
+    {
+        "question": "Nome do vilão final do Super Mario World",
+        "answers": [
+            "bowser"
+        ]
+    },
+    {
+        "question": "Nome do filho do Kratos em God of War",
+        "answers": [
+            "atreus",
+            "garoto"
+        ]
+    }
+]

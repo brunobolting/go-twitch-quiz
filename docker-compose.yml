@@ -1,0 +1,31 @@
+version: '3'
+
+networks:
+  app:
+    driver: bridge
+
+services:
+  web:
+    build: .
+    ports:
+     - "8080:8080"
+    depends_on:
+     - mongodb
+    environment:
+      DB_CONN: "mongodb://mongodb"
+      DB_DATABASE: "quiz"
+      API_PORT: 8080
+      API_HOST: ""
+    networks:
+      - app
+
+  mongodb:
+    image: "mongo"
+    ports:
+      - "27017:27017"
+    # volumes:
+    #   - ./.db:/data/db:rw
+    environment:
+      MONGO_INITDB_DATABASE: "quiz"
+    networks:
+      - app

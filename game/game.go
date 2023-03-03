@@ -37,11 +37,16 @@ func NewGame(tw *twitch.Twitch, qs *question.Service) *Game {
 
 func (g *Game) Start() error {
 	q, err := g.QuestionService.GetRandomQuestion(g.PreviusQuestions)
-	if err != nil {
+	if err != nil || q == nil {
 		if err.Error() != "EOF" {
 			return err
 		}
 		g.PreviusQuestions = []string{g.Question.ID}
+		q, err = g.QuestionService.GetRandomQuestion(g.PreviusQuestions)
+	}
+
+	if q == nil {
+		g.PreviusQuestions = []string{}
 		q, err = g.QuestionService.GetRandomQuestion(g.PreviusQuestions)
 	}
 

@@ -11,10 +11,13 @@ clean:
 dependencies:
 	go mod download
 
-build: dependencies build-app
+build: dependencies build-fixture build-app
 
 build-app:
-	go build -o ./bin main.go
+	go build -o ./bin/app main.go
+
+build-fixture:
+	go build -o ./bin/fixture fixture/fixture.go
 
 run:
 	go run .
