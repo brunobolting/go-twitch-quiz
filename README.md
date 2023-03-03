@@ -26,6 +26,16 @@ docker-compose build
 docker-compose up -V
 ```
 
+Pra acessar a aplicação basta acessar o localhost abaixo, colocando no `chat-from` o username da twitch que será usada como chat input.
+```
+http://localhost:8080/?chat-from=brunobolting
+```
+* Exemplo:
+    * Minha twitch é `twitch.com/brunobolting`
+    * Então vou colocar na url `?chat-from=brunobolting`
+
 Cada vez que o código for alterado é necessário rodar o `docker-compose build` novamente, para o código novo ser recompilado dentro do container docker.
 
 Uma nova funcionalidade que pode ser implementada é a criação de uma tela para cadastro de perguntas, hoje é utilizado um arquivo json que fica dentro da pasta `fixture`, que sempre que o container sobe é adicionado no mongodb. Um formulário para inserção das perguntas ajudaria pessoas menos técnicas a utilizar a aplicação também.
+
+Qualquer dica ou crítica para melhorar o projeto e o código são bem-vindas =)
